@@ -1,0 +1,82 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2012                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      T;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 0 0 1 0 0 0];
+
+internalField   uniform 278.15;
+
+boundaryField
+{
+    inlet
+    {
+        type            uniformFixedValue;
+
+        uniformValue
+        {
+            type        expression;
+
+            functions<scalar>
+            {
+                probeTemperature
+                {
+/*
+                    type        sample;
+                    field       T;
+                    position    (0.025 0.025 0.005);
+*/
+                    type                    functionObjectValue;
+                    functionObject          probeTemperature;
+                    functionObjectResult    average(T);
+                    defaultValue            278.15; 
+                }
+            }
+
+            variables
+            (
+                "dT = fn:probeTemperature() - 293.15"
+            );
+
+            expression
+            #{
+                308.15 - dT
+            #};
+        }
+
+        value           uniform 308.15;
+    }
+
+    outlet
+    {
+        type            zeroGradient;
+    }
+
+    wall
+    {
+        type            externalWallHeatFluxTemperature;
+        mode            coefficient;
+        Ta              uniform 278.15;
+        h               uniform 10;
+        kappaMethod     fluidThermo;
+        value           uniform 278.15;
+    }
+
+    frontAndBack
+    {
+        type            empty;
+    }
+}
+
+// ************************************************************************* //
