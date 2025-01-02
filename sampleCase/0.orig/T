@@ -22,49 +22,48 @@ boundaryField
 {
     inlet
     {
-        type            uniformFixedValue;
+        type            exprFixedValue;
 
-        uniformValue
+        functions<scalar>
         {
-            type        expression;
-
-            functions<scalar>
+            probeTemperature
             {
-                probeTemperature
-                {
 /*
-                    type        sample;
-                    field       T;
-                    position    (0.025 0.025 0.005);
+                type        sample;
+                field       T;
+                position    (0.025 0.025 0.005);
 */
-                    type                    functionObjectValue;
-                    functionObject          probeTemperature;
-                    functionObjectResult    average(T);
-                    defaultValue            278.15; 
+                type                    functionObjectValue;
+                functionObject          probeTemperature;
+                functionObjectResult    average(T);
+                defaultValue            278.15; 
+            }
+        }
+
+        storedVariables
+        (
+            {
+                name            I;
+                initialValue    "0.0";
+                value
+                {
+                    resultType      scalar;
+                    valueType       scalar;
+                    isSingleValue   true;
+                    value           0.0;
                 }
             }
+        );
 
-            storedVariables
-            (
-                {
-                    name            I;
-                    initialValue    "0.0";
-                }
-            );
+        variables
+        (
+            "KP = 0.5"
+            "KI = 0.2"
+            "dT = 293.15 - fn:probeTemperature()"
+            "I = I + dT*deltaT()"
+        );
 
-            variables
-            (
-                "KP = 0.5"
-                "KI = 0.2"
-                "dT = 293.15 - fn:probeTemperature()"
-                "I = I + dT*deltaT()"
-            );
-
-            expression
-            #{
-                KP*dT + KI*I + 308.15
-            #};
-        }
+        valueExpr       "KP*dT + KI*I + 308.15";
 
         value           uniform 308.15;
     }
