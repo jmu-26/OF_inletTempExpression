@@ -53,19 +53,33 @@ boundaryField
                     value           0.0;
                 }
             }
+            {
+                name            dTOld;
+                initialValue    "15.0";
+                value
+                {
+                    resultType      scalar;
+                    valueType       scalar;
+                    isSingleValue   true;
+                    value           15.0;
+                }
+            }
         );
 
         variables
         (
-            "KP = 0.5"
-            "KI = 0.2"
+            "KP = 1.0"
+            "KI = 1.0"
+            "KD = 1.0"
             "dT = 293.15 - fn:probeTemperature()"
             "I = I + dT*deltaT()"
+            "D = (dT - dTOld)/deltaT()"
+            "dTOld = dT"
         );
 
-        valueExpr       "KP*dT + KI*I + 308.15";
+        valueExpr       "KP*dT + KI*I + KD*D + 278.15";
 
-        value           uniform 308.15;
+        value           uniform 278.15;
     }
 
     outlet
