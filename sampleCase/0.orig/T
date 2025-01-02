@@ -44,14 +44,25 @@ boundaryField
                 }
             }
 
+            storedVariables
+            (
+                {
+                    name            I;
+                    initialValue    "0.0";
+                }
+            );
+
             variables
             (
-                "dT = fn:probeTemperature() - 293.15"
+                "KP = 0.5"
+                "KI = 0.2"
+                "dT = 293.15 - fn:probeTemperature()"
+                "I = I + dT*deltaT()"
             );
 
             expression
             #{
-                308.15 - dT
+                KP*dT + KI*I + 308.15
             #};
         }
 
