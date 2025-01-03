@@ -73,8 +73,8 @@ boundaryField
         variables
         (
             "KP = 1.0"
-            "KI = 1.0"
-            "KD = 1.0"
+            "KI = 0.5"
+            "KD = 0.2"
             //"dT = $targetT - fn:probeTemperature()"               // want to write like this
             "dT = 293.15 - fn:probeTemperature()"
             "I = I + dT*deltaT()"
