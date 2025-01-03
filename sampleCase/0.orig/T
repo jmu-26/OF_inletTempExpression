@@ -16,46 +16,76 @@ FoamFile
 
 dimensions      [0 0 0 1 0 0 0];
 
-internalField   uniform 278.15;
+initialT        278.15;
+targetT         293.15;
+
+internalField   uniform $initialT;
 
 boundaryField
 {
     inlet
     {
-        type            uniformFixedValue;
+        type            exprFixedValue;
 
-        uniformValue
+        functions<scalar>
         {
-            type        expression;
-
-            functions<scalar>
+            probeTemperature
             {
-                probeTemperature
-                {
 /*
-                    type        sample;
-                    field       T;
-                    position    (0.025 0.025 0.005);
+                type        sample;
+                field       T;
+                position    (0.025 0.025 0.005);
 */
-                    type                    functionObjectValue;
-                    functionObject          probeTemperature;
-                    functionObjectResult    average(T);
-                    defaultValue            278.15; 
-                }
+                type                    functionObjectValue;
+                functionObject          probeTemperature;
+                functionObjectResult    average(T);
+                defaultValue            $initialT;
             }
-
-            variables
-            (
-                "dT = fn:probeTemperature() - 293.15"
-            );
-
-            expression
-            #{
-                308.15 - dT
-            #};
         }
 
-        value           uniform 308.15;
+        storedVariables
+        (
+            {
+                name            I;
+                initialValue    "0.0";
+                value
+                {
+                    resultType      scalar;
+                    valueType       scalar;
+                    isSingleValue   true;
+                    value           0.0;
+                }
+            }
+            {
+                name            dTOld;
+                //initialValue    #eval "$targetT - $initialT";     // want to write like this
+                initialValue    "15.0";
+                value
+                {
+                    resultType      scalar;
+                    valueType       scalar;
+                    isSingleValue   true;
+                    value           #eval{$targetT - $initialT};
+                }
+            }
+        );
+
+        variables
+        (
+            "KP = 1.0"
+            "KI = 0.5"
+            "KD = 0.2"
+            //"dT = $targetT - fn:probeTemperature()"               // want to write like this
+            "dT = 293.15 - fn:probeTemperature()"
+            "I = I + dT*deltaT()"
+            "D = (dT - dTOld)/deltaT()"
+            "dTOld = dT"
+        );
+
+        //valueExpr       "KP*dT + KI*I + KD*D + $initialT";        // want to write like this
+        valueExpr       "KP*dT + KI*I + KD*D + 278.15";
+
+        value           uniform $initialT;
     }
 
     outlet
@@ -70,7 +100,7 @@ boundaryField
         Ta              uniform 278.15;
         h               uniform 10;
         kappaMethod     fluidThermo;
-        value           uniform 278.15;
+        value           uniform $initialT;
     }
 
     frontAndBack
