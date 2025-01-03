@@ -16,7 +16,10 @@ FoamFile
 
 dimensions      [0 0 0 1 0 0 0];
 
-internalField   uniform 278.15;
+initialT        278.15;
+targetT         293.15;
+
+internalField   uniform $initialT;
 
 boundaryField
 {
@@ -36,7 +39,7 @@ boundaryField
                 type                    functionObjectValue;
                 functionObject          probeTemperature;
                 functionObjectResult    average(T);
-                defaultValue            278.15; 
+                defaultValue            $initialT;
             }
         }
 
@@ -55,13 +58,14 @@ boundaryField
             }
             {
                 name            dTOld;
+                //initialValue    #eval "$targetT - $initialT";     // want to write like this
                 initialValue    "15.0";
                 value
                 {
                     resultType      scalar;
                     valueType       scalar;
                     isSingleValue   true;
-                    value           15.0;
+                    value           #eval{$targetT - $initialT};
                 }
             }
         );
@@ -71,15 +75,17 @@ boundaryField
             "KP = 1.0"
             "KI = 1.0"
             "KD = 1.0"
+            //"dT = $targetT - fn:probeTemperature()"               // want to write like this
             "dT = 293.15 - fn:probeTemperature()"
             "I = I + dT*deltaT()"
             "D = (dT - dTOld)/deltaT()"
             "dTOld = dT"
         );
 
+        //valueExpr       "KP*dT + KI*I + KD*D + $initialT";        // want to write like this
         valueExpr       "KP*dT + KI*I + KD*D + 278.15";
 
-        value           uniform 278.15;
+        value           uniform $initialT;
     }
 
     outlet
@@ -94,7 +100,7 @@ boundaryField
         Ta              uniform 278.15;
         h               uniform 10;
         kappaMethod     fluidThermo;
-        value           uniform 278.15;
+        value           uniform $initialT;
     }
 
     frontAndBack
