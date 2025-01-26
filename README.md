@@ -1,7 +1,7 @@
 # 説明
 OpenFOAMの計算で、流入境界条件にExpressions syntaxを使用したサンプルです。
 
-## sample_averagedOutlet
+## サンプル１：sample_averagedOutlet
 ### サンプルの説明
 流出境界の平均温度が20℃になるように、流入温度を制御する計算のサンプルケースです。
 流入境界で使用した境界条件`exprFixedValue`で、流出境界の平均温度を算出することによって、流入温度を制御しています。
@@ -17,7 +17,7 @@ OpenFOAMの計算で、流入境界条件にExpressions syntaxを使用したサ
 ![graph](https://github.com/user-attachments/assets/55e376a8-1cca-4b93-8f6b-879a2778fc13)
 
 
-## sample_probe_PIAD
+## サンプル２：sample_probe_PID
 ### サンプルの説明
 特定の位置でのセンサー点の温度が20℃になるように、流入温度をPID制御をする計算のサンプルケースです。
 
