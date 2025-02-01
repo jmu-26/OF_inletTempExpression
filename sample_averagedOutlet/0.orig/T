@@ -1,0 +1,65 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2012                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      T;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 0 0 1 0 0 0];
+
+initialT        278.15;
+targetT         293.15;
+
+internalField   uniform $initialT;
+
+boundaryField
+{
+    inlet
+    {
+        type            exprFixedValue;
+
+        variables
+        (
+            "relax = 0.005"
+            "currentT = weightAverage(T)"
+            "outletT{outlet} = weightAverage(T)"
+            //"nextT = currentT + relax*($targetT - outletT)"         // want to write like this
+            "nextT = currentT + relax*(293.15 - outletT)"
+        );
+
+        valueExpr       "nextT";
+
+        value           uniform $targetT;
+    }
+
+    outlet
+    {
+        type            zeroGradient;
+    }
+
+    wall
+    {
+        type            externalWallHeatFluxTemperature;
+        mode            coefficient;
+        Ta              uniform 278.15;
+        h               uniform 10;
+        kappaMethod     fluidThermo;
+        value           uniform $initialT;
+    }
+
+    frontAndBack
+    {
+        type            empty;
+    }
+}
+
+// ************************************************************************* //
