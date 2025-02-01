@@ -32,7 +32,7 @@ boundaryField
             "relax = 0.005"
             "currentT = weightAverage(T)"
             "outletT{outlet} = weightAverage(T)"
-            //"nextT = currentT - relax*(outletT - $initialT)"         // want to write like this
+            //"nextT = currentT - relax*(outletT - $targetT)"         // want to write like this
             "nextT = currentT - relax*(outletT - 293.15)"
         );
 
